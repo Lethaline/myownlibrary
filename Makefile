@@ -8,6 +8,7 @@ NAME = myownlibrary.a
 RM = rm -rf
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra
+GCOVFLAGS = --coverage
 
 # Directories
 
@@ -26,7 +27,8 @@ INC = \
 SRC = \
 	  ft_string/ft_strlen \
 
-TEST := $(shell find $(TESTDIR) -name '*.c')
+TEST = \
+	   ft_string/ft_strlen_test \
 
 # *************************************************************************** #
 
@@ -53,6 +55,8 @@ OBJS_DIR = $(sort $(dir $(OBJS)))
 INCS_DIR = $(addsuffix /, $(INCSDIR))
 INCS = $(addprefix -I , $(INCS_DIR))
 
+TESTFILES = $(addprefix $(TESTDIR)/, $(addsuffix .c, $(basename $(TEST))))
+
 all : $(NAME)
 
 $(NAME) : $(OBJS)
@@ -61,7 +65,6 @@ $(NAME) : $(OBJS)
 	echo "$(LOG_CLEAR)$(NAME)... $(LOG_GREEN)compiled $(LOG_GREEN)✓$(LOG_NOCOLOR)"
 
 clean :
-	$(RM) $(OBJS_DIR)
 	$(RM) $(OBJSDIR)
 
 fclean : clean
@@ -72,9 +75,16 @@ re : fclean all
 $(OBJSDIR)/%.o: $(SRCSDIR)/%.c
 	mkdir -p $(OBJSDIR) $(OBJS_DIR)
 	echo "$(LOG_CLEAR)$(NAME)... $(LOG_YELLOW)$<$(LOG_NOCOLOR)$(LOG_UP)"
-	$(CC) -c $(CFLAGS) $(INCS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 test : $(NAME)
-	for test in $(TEST) ; do \
-		echo "HERE"; \
+	for test in $(TESTFILES); do \
+		$(CC) $(CFLAGS) -o test $$test $<; \
+		./test; \
+		rm -rf test;\
 	done
+
+cov : 
+## Get namefile at beginning
+## Test file with -o name and object file with .c 
+## Try it 
