@@ -10,6 +10,10 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra
 GCOVFLAGS = --coverage
 
+ifeq ($(UNAME), linux)
+	VALGRIND = valgrind -q --leak-check=full
+endif
+
 # Directories
 
 SRCSDIR = srcs
@@ -17,6 +21,7 @@ INCSDIR = includes
 TESTDIR = tests
 OBJSDIR = objs
 LOGSDIR = logs
+COVSDIR = covs
 
 # Sources
 
@@ -67,7 +72,7 @@ $(NAME) : $(OBJS)
 clean :
 	$(RM) $(OBJSDIR)
 
-fclean : clean
+fclean : clean gclean
 	$(RM) $(NAME)
 
 re : fclean all
@@ -84,7 +89,19 @@ test : $(NAME)
 		rm -rf test;\
 	done
 
-cov : 
+cov :
+	mkdir -p $(COVSDIR)
+	mkdir -p $(LOGSDIR)
+	cp $(SRCS) $(COVSDIR)
+	cp $(TESTFILES) $(COVSDIR)
+	for file in ; do \
+		echo $$file; \
+	done
+
+gclean :
+	$(RM) $(LOGSDIR)
+	$(RM) $(COVSDIR)
+
 ## Get namefile at beginning
 ## Test file with -o name and object file with .c 
 ## Try it 
